@@ -1,6 +1,5 @@
-; $Id$
 name = Islandora Core
 description = Show the core islandora module.
 package = Islandora
-version = 7.x-dev-$Format:%h$
+version = 7.x-$Format:%h-$dev
 core = 7.x
