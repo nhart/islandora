@@ -199,18 +199,14 @@
       <td valign="top">
         <a>
           <xsl:attribute name="href">
-            <xsl:copy-of select="$OBJECTSPAGE"/>fedora/repository/
-            <xsl:copy-of select="$PIDVALUE"/>/-/
-            <xsl:value-of select="$CLEANTITLE"/>
+            <xsl:copy-of select="$OBJECTSPAGE"/>fedora/repository/<xsl:copy-of select="$PIDVALUE"/>/-/<xsl:value-of select="$CLEANTITLE"/>
           </xsl:attribute>
 			<!--<xsl:attribute name="href"><xsl:copy-of select="$OBJECTSPAGE"/><![CDATA[&pid=]]><xsl:value-of select="$PIDVALUE"/><![CDATA[&collection=object]]>
 
 				</xsl:attribute>-->
           <img>
             <xsl:attribute name="src">
-              <xsl:copy-of select="$OBJECTSPAGE"/>fedora/repository/
-              <xsl:copy-of select="$PIDVALUE"/>/TN
-            </xsl:attribute>
+              <xsl:copy-of select="$OBJECTSPAGE"/>fedora/repository/<xsl:copy-of select="$PIDVALUE"/>/TN</xsl:attribute>
           </img>
         </a>
 
@@ -234,29 +230,22 @@
 							<!--<xsl:attribute name="href"><![CDATA[http://localhost/drupal-5.1/?q=node/7&pid=]]><xsl:value-of select="$PIDVALUE"/><![CDATA[&collection=object]]>-->
 							<!--<xsl:attribute name="href"><xsl:copy-of select="$OBJECTSPAGE"/><![CDATA[&pid=]]><xsl:value-of select="$PIDVALUE"/><![CDATA[&collection=object]]>-->
                 <xsl:attribute name="href">
-                  <xsl:copy-of select="$OBJECTSPAGE"/>fedora/repository/
-                  <xsl:value-of select="$PIDVALUE"/>/-/
-                  <xsl:value-of select="$CLEANTITLE"/>
-
-                </xsl:attribute>
+                  <xsl:copy-of select="$OBJECTSPAGE"/>fedora/repository/<xsl:value-of select="$PIDVALUE"/>/-/<xsl:value-of select="$CLEANTITLE"/>
+				</xsl:attribute>
 
                 <xsl:value-of select="$PIDVALUE"/>
                 <br />
               </a>
               <span class="searchtitle">
                 <span >
-								Score:(
-                  <xsl:value-of select="@score"/>)
+								Score:(<xsl:value-of select="@score"/>)
                 </span>
                 <br />
                 <a>
 								<!--<xsl:attribute name="href"><xsl:copy-of select="$OBJECTSPAGE"/><![CDATA[&pid=]]><xsl:value-of select="$PIDVALUE"/><![CDATA[&collection=object]]>-->
                                 
                   <xsl:attribute name="href">
-                    <xsl:copy-of select="$OBJECTSPAGE"/>fedora/repository/
-                    <xsl:value-of select="$PIDVALUE"/>/-/
-                    <xsl:value-of select="$CLEANTITLE"/>
-
+                    <xsl:copy-of select="$OBJECTSPAGE"/>fedora/repository/<xsl:value-of select="$PIDVALUE"/>/-/<xsl:value-of select="$CLEANTITLE"/>
                   </xsl:attribute>
                   <xsl:value-of select="field[@name='dc.title']/node()" disable-output-escaping="yes"/>
                 </a>
