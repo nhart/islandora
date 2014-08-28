@@ -67,7 +67,7 @@ class IslandoraTuque {
     }
 
     if (!isset($url)) {
-      $url = variable_get('islandora_base_url', 'http://localhost:8080/fedora');
+      $url = variable_get('fedora_base_url', 'http://localhost:8080/fedora');
     }
 
     if(self::exists()) {

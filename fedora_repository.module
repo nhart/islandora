@@ -1158,6 +1158,10 @@ function fedora_object_as_attachment($pid, $dsId, $label=NULL, $version=NULL) {
  * @return type 
  */
 function repository_page($pid = NULL, $dsId = NULL, $collection = NULL, $pageNumber = NULL) {
+module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
+  if($pid && !valid_pid($pid)) {
+    return drupal_not_found();
+  }
 //do security check at fedora_repository_get_items function as it has to be called there in case
 //someone trys to come in a back door.
   return fedora_repository_get_items($pid, $dsId, $collection, $pageNumber);

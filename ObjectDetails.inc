@@ -105,6 +105,14 @@ function fedora_repository_object_details_XSLT($item) {
     $newdom = $proc->transformToDoc($input);
     $output = $newdom->saveHTML();
   }
+  // Being used to test meta description tag
+  if ($dsid == 'MODS' && !empty($xmlstr)) {
+  // gross preg because of inconsistency of mods:abstract and abstract
+  preg_match('/abstract\>(.*?)\</', $xmlstr, $match);
+    if ($match[1]) {
+      drupal_set_html_head('<meta name="description" content="' . $match[1] . '" />');
+    }
+  }
   return $output;
 }
 

@@ -178,7 +178,7 @@ class ObjectHelper {
         
         if ($curl_stat !== FALSE) {
           $info = curl_getinfo($ch);
-          
+         drupal_set_header('Cache-Control: private', TRUE); 
           //Set what headers we can...
           if ($mimeType = $info['content_type']) {
             drupal_set_header("Content-Type: $mimeType");
@@ -224,6 +224,7 @@ class ObjectHelper {
             
             drupal_set_header('HTTP/1.1 307 Moved Temporarily');
             drupal_set_header('Location: ' . url($effective_url, array('query' => $query)));
+
           }
           elseif ((isset($user) && $user->uid != 0) || $forceSoap || isset($_SERVER['HTTPS'])) { //If not anonymous, soap is force or we're using HTTPS
             //Have the webserver mediate the transfer (download and restream)
