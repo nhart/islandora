@@ -17,8 +17,8 @@ class ObjectHelper {
   public static $PURGE_FEDORA_OBJECTSANDSTREAMS = 'purge objects and datastreams';
   public static $ADD_FEDORA_STREAMS = 'add fedora datastreams';
   public static $INGEST_FEDORA_OBJECTS = 'ingest new fedora objects';
-  public static $EDIT_TAGS_DATASTREAM = 'edit tags datastream';
   public static $VIEW_DETAILED_CONTENT_LIST = 'view detailed list of content';
+  public static $VIEW_FEDORA_SOAP_ERROR_MESSAGES = 'view fedora soap error messages';
 
   // TODO: Make this into a static member constant
   public $availableDataStreamsText = 'Detailed list of content';
@@ -93,7 +93,7 @@ class ObjectHelper {
       return ' ';
     }
 
-    if (!fedora_repository_access(OBJECTHELPER :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user)) {
+    if (!fedora_repository_check_perm(OBJECTHELPER :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user)) {
       drupal_set_message(t("You do not have access Fedora objects within the attempted namespace."), 'error');
       drupal_access_denied();
       return ' ';
@@ -178,7 +178,10 @@ class ObjectHelper {
         
         if ($curl_stat !== FALSE) {
           $info = curl_getinfo($ch);
-         drupal_set_header('Cache-Control: private', TRUE); 
+          // Fixes an IE issue (ISLANDORA-311)
+          // http://support.microsoft.com/kb/316431 
+          drupal_set_header("Cache-Control: private", TRUE); 
+
           //Set what headers we can...
           if ($mimeType = $info['content_type']) {
             drupal_set_header("Content-Type: $mimeType");
@@ -296,7 +299,7 @@ class ObjectHelper {
       drupal_set_message(t('You must specify an object pid and datastream ID.'), 'error');
       return '';
     }
-    if (!fedora_repository_access(ObjectHelper :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user)) {
+    if (!fedora_repository_check_perm(ObjectHelper :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user)) {
       drupal_set_message(t('You do not have the appropriate permissions'), 'error');
       return;
     }
@@ -331,7 +334,7 @@ class ObjectHelper {
       drupal_set_message(t('You must specify an object pid and datastream ID.'), 'error');
       return '';
     }
-    if (!fedora_repository_access(ObjectHelper :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user)) {
+    if (!fedora_repository_check_perm(ObjectHelper :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user)) {
       drupal_set_message(t('You do not have the appropriate permissions'), 'error');
       return;
     }
@@ -366,7 +369,7 @@ class ObjectHelper {
     $item = new Fedora_Item($pid);
 
     $purge_image = '&nbsp;';
-    if (user_access(ObjectHelper :: $PURGE_FEDORA_OBJECTSANDSTREAMS)) {
+    if (fedora_repository_check_perm(ObjectHelper :: $PURGE_FEDORA_OBJECTSANDSTREAMS, $pid)) {
       $allow = TRUE;
       if (module_exists('fedora_fesl')) {
         $allow = fedora_fesl_check_roles($pid, 'write');
@@ -386,7 +389,7 @@ class ObjectHelper {
     // Add an icon to replace a datastream
     // @TODO Note: using l(theme_image(..), ...); for these image links (and other links) may remove the need to have clean urls enabled.
     $replace_image = '&nbsp;';
-    if (user_access(ObjectHelper :: $ADD_FEDORA_STREAMS)) {
+    if (fedora_repository_check_perm(ObjectHelper :: $ADD_FEDORA_STREAMS, $pid)) {
       $allow = TRUE;
       if (module_exists('fedora_fesl')) {
         $allow = fedora_fesl_check_roles($pid, 'write');
@@ -531,7 +534,7 @@ class ObjectHelper {
     $dsid = array_key_exists('QDC', $ds_list) ? 'QDC' : 'DC';
     $path = drupal_get_path('module', 'fedora_repository');
 
-    if (user_access(ObjectHelper :: $EDIT_FEDORA_METADATA)) {
+    if (fedora_repository_check_perm(ObjectHelper :: $EDIT_FEDORA_METADATA, $pid)) {
       $allow = TRUE;
       if (module_exists('fedora_fesl')) {
         $allow = fedora_fesl_check_roles($pid, 'write');
@@ -571,7 +574,7 @@ class ObjectHelper {
     $dataStreamBody = '';
     $fedoraItem = new Fedora_Item($object_pid);
 
-    if (user_access(ObjectHelper :: $VIEW_DETAILED_CONTENT_LIST)) {
+    if (fedora_repository_check_perm(ObjectHelper :: $VIEW_DETAILED_CONTENT_LIST, $object_pid)) {
       $availableDataStreamsText = 'Detailed List of Content';
 
       $mainStreamLabel = NULL;
@@ -604,7 +607,7 @@ class ObjectHelper {
       
       $dataStreamBody = theme('table', $headers, $DSs);
       //if they have access let them add a datastream
-      if (user_access(ObjectHelper::$ADD_FEDORA_STREAMS) && //If allowed throw Drupal
+      if (fedora_repository_check_perm(ObjectHelper::$ADD_FEDORA_STREAMS, $object_pid) && //If allowed throw Drupal
         ((module_exists('fedora_fesl') && fedora_fesl_check_roles($object_pid, 'write')) || //And allowed throw FESL 
         !module_exists('fedora_fesl'))) { //Or not using FESL, draw the add datastream form.
         $dataStreamBody .= drupal_get_form('add_stream_form', $object_pid);
@@ -669,36 +672,6 @@ class ObjectHelper {
     }
 
     return $cmodels;
-  }
-
-  /**
-   * determines whether we can see the object or not
-   * checks PID namespace permissions, and user permissions
-   * @global type $user
-   * @param type $op
-   * @param type $pid
-   * @return type 
-   */
-  function fedora_repository_access($op, $pid = NULL, $as_user = NULL) {
-    $returnValue = FALSE;
-    
-    if ($pid == NULL) {
-      $pid = variable_get('fedora_repository_pid', 'islandora:root');
-    }
-
-    $isRestricted = variable_get('fedora_namespace_restriction_enforced', TRUE);
-    $namespace_access = NULL;
-    if (!$isRestricted) {
-      $namespace_access = TRUE;
-    }
-    else {    
-      $pid_namespace = substr($pid, 0, strpos($pid, ':') + 1); //Get the namespace (with colon)
-      $allowed_namespaces = explode(" ", variable_get('fedora_pids_allowed', 'default: demo: changeme: islandora: ilives: islandora-book: books: newspapers: '));
-
-      $namespace_access = in_array($pid_namespace, $allowed_namespaces);
-    }
-    
-    return ($namespace_access && user_access($op, $as_user));
   }
 
   /**
@@ -793,7 +766,7 @@ class ObjectHelper {
    * @return boolean
    */
   function get_and_do_datastream_rules($pid, $dsid, $file = '') {
-    if (!user_access('ingest new fedora objects')) {
+    if (!fedora_repository_check_perm('ingest new fedora objects', $pid)) {
       drupal_set_message(t('You do not have permission to add datastreams.'));
       return FALSE;
     }
@@ -808,6 +781,7 @@ class ObjectHelper {
    * Get a tree of related pids - for the basket functionality
    *
    * FIXME:  This doesn't actually get a tree...
+   * XXX: Is this still required, without basket being in?
    *
    * @param type $pid
    * @return type 

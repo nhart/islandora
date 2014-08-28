@@ -1,7 +1,5 @@
 <?php
 
-
-
 /**
  * @file
  * formClass class
@@ -18,7 +16,7 @@ class formClass {
 
   /**
    * Create the paths for urls and map them to php functions
-   * @return array 
+   * @return array
    */
   function createMenu() {
     $items = array();
@@ -43,6 +41,7 @@ class formClass {
       'title' => t('Solution Packs'),
       'description' => t('Install content models and collections required by installed solution packs.'),
       'page callback' => 'fedora_repository_solution_packs_page',
+      'access callback' => 'fedora_repository_check_perm',
       'access arguments' => array('add fedora datastreams'),
       'file' => 'fedora_repository.solutionpacks.inc',
       'type' => MENU_LOCAL_TASK,
@@ -52,6 +51,7 @@ class formClass {
       'page callback' => 'fedora_repository_display_schema',
       'page arguments' => array('islandoracm.xsd'),
       'type' => MENU_CALLBACK,
+      'access callback' => 'fedora_repository_check_perm',
       'access arguments' => array('view fedora collection'),
     );
 
@@ -60,24 +60,28 @@ class formClass {
       'page callback' => 'fedora_repository_display_schema',
       'page arguments' => array('collection_policy.xsd'),
       'type' => MENU_CALLBACK,
+      'access callback' => 'fedora_repository_check_perm',
       'access arguments' => array('view fedora collection'),
     );
 
     $items['fedora'] = array(
       'page callback' => 'repository_page',
       'type' => MENU_CALLBACK,
-      'access arguments' => array('view fedora collection'),
+      'access callback' => 'fedora_repository_check_perm',
+      'access arguments' => array('view fedora collection', 1),
     );
     $items['fedora/repository'] = array(
       'title' => 'Digital Repository',
       'page callback' => 'repository_page',
       'type' => MENU_NORMAL_ITEM,
-      'access arguments' => array('view fedora collection'),
+      'access callback' => 'fedora_repository_check_perm',
+      'access arguments' => array('view fedora collection', 2),
     );
 
     $items['fedora/repository/service'] = array(
       'page callback' => 'repository_service',
       'type' => MENU_CALLBACK,
+      'access callback' => 'fedora_repository_check_perm',
       'access arguments' => array('view fedora collection'),
     );
 
@@ -85,91 +89,56 @@ class formClass {
       'title' => t('Download object'),
       'page callback' => 'fedora_object_as_attachment',
       'type' => MENU_CALLBACK,
+      'access callback' => 'fedora_repository_check_perm',
       'access arguments' => array('view fedora collection')
     );
-    
+
     $items['fedora/repository/editmetadata'] = array(
       'title' => t('Edit metadata'),
       'page callback' => 'fedora_repository_edit_qdc_page',
       'type' => MENU_CALLBACK,
-      'access arguments' => array('edit fedora meta data')
+      'access callback' => 'fedora_repository_check_perm',
+      'access arguments' => array('edit fedora meta data', 3)
     );
-    
+
     $items['fedora/repository/purgeStream'] = array(
       'title' => t('Purge data stream'),
       'page callback' => 'fedora_repository_purge_stream',
       'type' => MENU_CALLBACK,
-      'access arguments' => array('purge objects and datastreams')
+      'access callback' => 'fedora_repository_check_perm',
+      'access arguments' => array('purge objects and datastreams', 3)
     );
-    
+
     $items['fedora/repository/replaceStream'] = array(
       'title' => t('Replace Stream'),
       'page callback' => 'fedora_repository_replace_stream',
       'type' => MENU_CALLBACK,
-      'access arguments' => array('add fedora datastreams'),
+      'access callback' => 'fedora_repository_check_perm',
+      'access arguments' => array('add fedora datastreams', 3),
     );
-    
+
     $items['fedora/repository/purgeObject'] = array(
       'title' => t('Purge object'),
       'page callback' => 'fedora_repository_purge_object',
       'type' => MENU_CALLBACK,
-      'access arguments' => array('purge objects and datastreams')
+      'access callback' => 'fedora_repository_check_perm',
+      'access arguments' => array('purge objects and datastreams', 3)
     );
-    
+
     $items['fedora/repository/addStream'] = array(
       'title' => t('Add stream'),
       'page callback' => 'add_stream',
       'type' => MENU_CALLBACK,
-      'access arguments' => array('add fedora datastreams')
+      'access callback' => 'fedora_repository_check_perm',
+      'access arguments' => array('add fedora datastreams', 3)
     );
-    
-    //new for mnpl******************************************
-    $items['fedora/repository/mnpl_advanced_search'] = array(
-      'title' => t('Repository advanced search'),
-      'page callback' => 'fedora_repository_mnpl_advanced_search',
-      'type' => MENU_CALLBACK,
-      'access arguments' => array('view fedora collection')
-    );
-    
+
     $items['fedora/ingestObject'] = array(
       'title' => t('Ingest object'),
       'page callback' => 'fedora_repository_ingest_object',
       'type' => MENU_CALLBACK,
-      'access arguments' => array('add fedora datastreams')
-    );
-
-    $items['fedora/repository/list_terms'] = array(
-      'title' => t('List terms'),
-      'page callback' => 'fedora_repository_list_terms',
-      'type' => MENU_CALLBACK,
-      'access arguments' => array('view fedora collection')
-    );
-
-    /* Export functionality */
-    $items['fedora/basket'] = array(
-      'title' => t('Fedora Basket'),
-      'description' => t('View and download objects added to your basket'),
-      'page callback' => 'fedora_repository_basket',
-      'access arguments' => array('view fedora collection'),
-      'type' => MENU_CALLBACK,
-    );
-
-    $items['fedora/repository/addToBasket'] = array(
-      'page callback' => 'fedora_repository_add_to_basket',
-      'type' => MENU_CALLBACK,
-      'access arguments' => array('view fedora collection'),
-    );
-
-    $items['fedora/repository/removeFromBasket'] = array(
-      'page callback' => 'fedora_repository_remove_from_basket',
-      'type' => MENU_CALLBACK,
-      'access arguments' => array('view fedora collection'),
-    );
-
-    $items['fedora/repository/add_search_results_to_basket'] = array(
-      'page callback' => 'fedora_repository_add_search_results_to_basket',
-      'type' => MENU_CALLBACK,
-      'access arguments' => array('view fedora collection'),
+      'access callback' => 'fedora_repository_check_perm',
+      'access arguments' => array('add fedora datastreams', 2)
     );
 
     $items['admin/settings/fedora_repository/object_details_xslt'] = array(
@@ -189,21 +158,43 @@ class formClass {
       'access arguments' => array('administer site configuration'),
     );
 
+    $items['islandora/fedora/url'] = array(
+      'page callback' => 'update_fedora_url_div',
+      'access arguments' => array('view fedora collection'),
+      'file' => 'fedora_repository.module',
+      'type' => MENU_CALLBACK,
+    );
+
     return $items;
   }
 
   /**
    * Create admin form
-   * @return array 
+   * @return array
    */
-  function createAdminForm() {
+  function createAdminForm(&$form_state) {
     if (!user_access('administer site configuration')) {
       drupal_set_message(t('You must be a site administrator to edit the Fedora collections list.'), 'error');
       return;
     }
     module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
     module_load_include('inc', 'fedora_repository', 'ObjectHelper');
+    $fedora_path = isset($form_state['values']['fedora_base_url']) ? $form_state['values']['fedora_base_url'] : variable_get('fedora_base_url', 'http://localhost:8080/fedora');
+    $parts = @parse_url($fedora_path);
+    if($parts &!isset($parts['scheme'])){
+      $fedora_path = "http://" . $fedora_path;
+    }
+    $triplepath = "$fedora_path/risearch";
+    $response = do_curl_ext($fedora_path . '/describe');
+    $available = ($response != NULL) ? ($response[1] == 0) : FALSE;
+
+    $confirmation_message = ($available ? '<img src="' . url('misc/watchdog-ok.png') . '"/>'
+            . t('Successfully connected to Fedora server at @fedora_soap_url', array('@fedora_soap_url' => $fedora_path)) : '<img src="'
+            . url('misc/watchdog-error.png') . '"/> '
+            . t('Unable to connect to Fedora server at @fedora_soap_url', array('@fedora_soap_url' => $fedora_path)));
+
     $form = array();
+
     $form['fedora_repository_pid'] = array(
       '#type' => 'textfield',
       '#title' => t('Root Collection PID'),
@@ -213,44 +204,40 @@ class formClass {
       '#weight' => -18
     );
 
-    $form['fedora_base_url'] = array(
+
+
+// new ahah stuff
+
+    $form['fedora_ahah_wrapper'] = array(
+      '#prefix' => '<div id="islandora-fedora-url">',
+      '#suffix' => '</div>',
+      '#type' => 'markup',
+    );
+
+    $form['fedora_ahah_wrapper']['fedora_base_url'] = array(
       '#type' => 'textfield',
       '#title' => t('Fedora base URL'),
-      '#default_value' => variable_get('fedora_base_url', 'http://localhost:8080/fedora'),
+      '#default_value' => $fedora_path,
       '#description' => t('The URL to use for REST-type connections'),
-      '#required' => TRUE,
-      '#weight' => -16,
+      '#ahah' => array(
+        'path' => 'islandora/fedora/url',
+        'wrapper' => 'islandora-fedora-url',
+        'effect' => 'fade',
+        'event' => 'change'),
     );
-    
-
-    $form['fedora_repository_url'] = array(
+    $form['fedora_ahah_wrapper']['infobox'] = array(
+      '#type' => 'item',
+      '#value' => $confirmation_message,
+    );
+    $form['fedora_ahah_wrapper']['fedora_repository_url'] = array(
       '#type' => 'textfield',
       '#title' => t('Fedora RISearch URL'),
-      '#default_value' => variable_get('fedora_repository_url', 'http://localhost:8080/fedora/risearch'),
-      '#description' => t('The url of the Fedora server'), '#required' => TRUE,
-      '#weight' => -14
-    );
-    
-    $form['fedora_soap_url'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Fedora SOAP Url'),
-      '#default_value' => variable_get('fedora_soap_url', 'http://localhost:8080/fedora/services/access?wsdl'),
-      '#description' => t('The URL to use for SOAP connections'),
+      '#default_value' => $triplepath,
+      '#description' => t('The url of the Fedora server\'s Triplestore.  Change this only if you have set up an external triplestore'),
       '#required' => TRUE,
-      '#weight' => -12,
-      '#suffix' => '<p>' . (
-        fedora_available() ? 
-          theme('image', 'misc/watchdog-ok.png') . t('Successfully connected to Fedora server at @fedora_soap_url', array('@fedora_soap_url' => variable_get('fedora_soap_url', ''))) :
-          theme('image', 'misc/watchdog-error.png') . t('Unable to connect to Fedora server at @fedora_soap_url', array('@fedora_soap_url' => variable_get('fedora_soap_url', '')))) . '</p>',
+
     );
 
-    $form['fedora_soap_manage_url'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Fedora SOAP management URL'),
-      '#default_value' => variable_get('fedora_soap_manage_url', 'http://localhost:8080/fedora/wsdl?api=API-M'), '#description' => t('The URL to use for SOAP API-M connections'),
-      '#required' => TRUE,
-      '#weight' => -10
-    );
 
 // will allow admin user to remove namepsace restrictions if not explicitly disallowed  in settings.php
     if (variable_get('allow_open_namespace', TRUE)) {
@@ -319,7 +306,7 @@ class formClass {
           if (array_key_exists('config', $profile)) {
             $config_path = $profile['config'];
             if (isset($config_path) && $config_path != "") {
-              $display_options[$machine_name] .= " (". l("config", $config_path, array()) .")";
+              $display_options[$machine_name] .= " (" . l("config", $config_path, array()) . ")";
             }
           }
         }
@@ -347,22 +334,22 @@ class formClass {
       '#default_value' => variable_get('fedora_object_restrict_datastreams', FALSE),
       '#description' => t('When enabled, restricts access to fedora object datastreams that are not listed in the Islandora Content Model for the object (unless the user is an administrator).'),
     );
-    
+
     $form['advanced']['fedora_repository_use_imagecache_external_in_collection_view'] = array(
       '#type' => 'checkbox',
       '#title' => t('Allow imagecache_external use for thumbnails in collection view'),
       '#default_value' => variable_get('fedora_repository_use_imagecache_external_in_collection_view', FALSE),
       '#description' => t('If enabled, the default collection list view (or ' .
-        'anywhere the function "@function" is used) will try to use ' .
-        'imagecache_external, defaulting to the "@preset" preset.  XSLTs may ' .
-        'be updated to use this function.', 
-        array(
-          '@function' => '_fedora_repository_render_image()',
-          '@preset' => 'fedora_repository_collection_thumbnail',
-          '@xsl' => 'sparql_to_html.xsl',
-        )),
+          'anywhere the function "@function" is used) will try to use ' .
+          'imagecache_external, defaulting to the "@preset" preset.  XSLTs may ' .
+          'be updated to use this function.',
+          array(
+            '@function' => '_fedora_repository_render_image()',
+            '@preset' => 'fedora_repository_collection_thumbnail',
+            '@xsl' => 'sparql_to_html.xsl',
+      )),
     );
-    
+
     $form['advanced']['fedora_control_group_control_during_ingest'] = array(
       '#type' => 'checkbox',
       '#title' => t('Allow control groups select in datastream ingest'),
@@ -370,19 +357,39 @@ class formClass {
       '#default_value' => variable_get('fedora_control_group_control_during_ingest', FALSE),
     );
 
+    //FITS functionality
+    $form['advanced']['enable_fits'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable FITS support?'),
+      '#description' => t('Whether or not we should create a FITS datastream upon object ingest.'),
+      '#default_value' => variable_get('enable_fits', FALSE),
+    );
+
+    //FITS Path
+    $form['advanced']['fits_path'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Path to FITS executable'),
+      '#description' => t("Path to FITS program on your server. It must be accessible by Drupal (i.e. apache user)."),
+      '#default_value' => variable_get('fits_path', '/usr/local/bin/fits.sh'),
+    );
+
     //Export functionality
     $form['advanced']['module']['export_area'] = array(
       '#type' => 'textfield',
       '#title' => t('Export area'),
       '#default_value' => variable_get('export_area', file_directory_path() . '/fedora_export_area'),
-      '#description' => t("Path to the export area. It must be accessible by druapl (i.e. apache user)."),
+      '#description' => t("Path to the export area. It must be accessible by drupal (i.e. apache user)."),
       '#required' => TRUE,
     );
 
     $form['#attributes'] = array('enctype' => "multipart/form-data");
+  $form['buttons']['submit'] = array('#type' => 'submit', '#value' => t('Save Configuration'));
+  $form['buttons']['reset'] = array('#type' => 'submit', '#value' => t('Reset to defaults'));
+  $form['#submit'][] = 'islandora_fedora_settings_form_submit';
+  $form['#theme'] = 'system_settings_form';
+  return ($form);
 
-
-    return system_settings_form($form);
+   // return system_settings_form($form);
   }
 
   /**
@@ -390,7 +397,7 @@ class formClass {
    * @param type $form_id
    * @param type $form_values
    * @param type $client
-   * @return type 
+   * @return type
    */
   function updateMetaData($form_id, $form_values, $client) {
     // ======================================
@@ -409,13 +416,13 @@ class formClass {
 
     // DC elements
     $previousElement = NULL; // Used in case we have to nest elements for qualified dublin core.
-    
+
     $label = null;
     foreach ($form_values as $key => $value) {
       //echo ($key);
       if ($key == 'dc:title-0') {
         $label = $value;
-      } 
+      }
       $index = strrpos($key, '-');
       $key = substr($key, 0, $index);
       $test = substr($key, 0, 2);
@@ -437,12 +444,11 @@ class formClass {
     }
 
     // Save the title
-    if ( $label != null )
-    {
+    if ($label != null) {
       $object = new Fedora_Item($form_values['pid']);
       $object->modify_object($label);
-    } 
-    
+    }
+
     $dom->appendChild($oai);
 
     if (!$client) {
@@ -472,7 +478,7 @@ class formClass {
    * to determine if this user is allowed to ingest in this collection
    * we assume if they are able to modify objects in the collection they can ingest as well.
    * @param type $collection_pid
-   * @return type 
+   * @return type
    */
   function can_ingest_here($collection_pid) {
     module_load_include('inc', 'fedora_repository', 'SecurityClass');
@@ -483,12 +489,16 @@ class formClass {
   /**
    * Drupal's permissions at this point no xacml yet. xacml decisions are made by fedora
    * @param type $collection_pid
-   * @return type 
+   * @return type
    */
   function canShowIngestForm($collection_pid) {
-    if (!user_access('ingest new fedora objects')) {
-      drupal_set_message(t('You do not have permission to ingest.'), 'error');
-      return FALSE;
+    if (!fedora_repository_check_perm('ingest new fedora objects', $collection_pid)) {
+      $ingest_override_array = module_invoke_all('fedora_repository_can_ingest', $collection_pid);
+      $overrides = array_filter($ingest_override_array);
+      if (empty($overrides)) {
+        drupal_set_message(t('You do not have permission to ingest.'), 'error');
+        return FALSE;
+      }
     }
     module_load_include('inc', 'fedora_repository', 'SecurityClass');
     $security_class = new SecurityClass();
@@ -508,11 +518,11 @@ class formClass {
 
   /**
    * Creates the first page of the ingest form for editing QDC.
-   * 
+   *
    * @param string $collection_pid
    * @param string $collection_label
    * @param array $form_state
-   * 
+   *
    * @return array
    */
   function createQDCIngestFormPageOne($collection_pid, $collection_label, array &$form_state) {
@@ -558,11 +568,11 @@ class formClass {
 
   /**
    * Create the second page of the ingest form for editing QDC
-   * 
+   *
    * @param string $collection_pid
    * @param string $collection_label
    * @param array $form_state
-   * 
+   *
    * @return array
    */
   function createQDCIngestFormPageTwo($collection_pid, $collection_label, array &$form_state) {
@@ -578,26 +588,28 @@ class formClass {
           drupal_set_message($error, 'error');
         }
       }
-      $form['collection_pid'] = array(
-        '#type' => 'hidden',
-        '#value' => $collection_pid
-      );
-      $form['submit'] = array(
-        '#type' => 'submit',
-        '#submit' => array('fedora_repository_ingest_form_submit'),
-        '#value' => t('Ingest')
-      );
+      else {
+        $form['collection_pid'] = array(
+          '#type' => 'hidden',
+          '#value' => $collection_pid
+        );
+        $form['submit'] = array(
+          '#type' => 'submit',
+          '#submit' => array('fedora_repository_ingest_form_submit'),
+          '#value' => t('Ingest')
+        );
+      }
     }
     return $form;
   }
 
   /**
    * Create the QDC Ingest Form.
-   * 
+   *
    * @param type $collection_pid
    * @param type $collection_label
-   * @param array $form_state 
-   * 
+   * @param array $form_state
+   *
    * @return array
    */
   function createQDCIngestForm($collection_pid, $collection_label, array &$form_state) {
@@ -613,18 +625,18 @@ class formClass {
 
   /**
    * Create a multi step form (wizard) for ingesting objects into Fedora
-   * 
+   *
    * @param string $collection_pid
    * @param string $collection_label
    * @param array $form_state
-   * 
-   * @return array 
+   *
+   * @return array
    */
   function createIngestForm($collection_pid, $collection_label, array &$form_state) {
     if (!$this->canShowIngestForm($collection_pid)) {
       return FALSE;
     }
-    
+
     drupal_set_title($collection_label);
     if (module_exists('islandora_content_model_forms')) {
       module_load_include('inc', 'islandora_content_model_forms', 'IngestObjectMetadataForm');
@@ -643,7 +655,7 @@ class formClass {
    * this function may not be being used
    * @param type $pid
    * @param type $form_state
-   * @return string 
+   * @return string
    */
   function createAddDataStreamForm($pid, &$form_state) {
     //dump_vars($form_state);
@@ -723,7 +735,7 @@ class formClass {
       // '#required'=>'TRUE',
       '#description' => t('The file to upload. (Only for Managed and Inline)')
     );
-    
+
     if (variable_get('fedora_control_group_control_during_ingest', FALSE)) {
       $form['fieldset']['ds_reference'] = array(
         '#type' => 'textfield',
@@ -732,7 +744,7 @@ class formClass {
         '#description' => t('A URL reference to resolve for the contents of the datastream.  (Required for External and Redirect, but will still work for Managed and Inline.)'),
       );
     }
-    
+
     $form['#redirect'] = "fedora/repository/$pid/";
     $form['fieldset']['submit'] = array(
       '#type' => 'submit',
@@ -758,7 +770,7 @@ class formClass {
         '#weight' => -1,
       );
     }
-    
+
     if (variable_get('fedora_control_group_control_during_ingest', FALSE)) {
       $form['fieldset']['control_group'] = array(
         '#type' => 'select',
@@ -778,13 +790,13 @@ class formClass {
 
   /**
    * Create QDC Edit form.
-   * 
+   *
    * @param string $pid
    * @param string $dsid
    * @param object $client
    * @param array $form_state
-   * 
-   * @return string 
+   *
+   * @return string
    */
   function createQDCEditForm($pid, $dsid, $client, &$form_state) {
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
@@ -869,7 +881,7 @@ class formClass {
    * @param type $dsid
    * @param type $client
    * @param boolean $form_state
-   * @return type 
+   * @return type
    */
   function createMetaDataForm($pid, $dsid, $client, &$form_state) {
     if (module_exists('islandora_content_model_forms')) {
@@ -890,13 +902,13 @@ class formClass {
    * @param type $dsId
    * @param type $dsLabel
    * @param type $form_state
-   * @return type 
+   * @return type
    */
   function createReplaceDataStreamForm($pid, $dsId, $dsLabel, &$form_state) {
     $form = array();
 
     $form['#attributes']['enctype'] = 'multipart/form-data';
-    
+
     module_load_include('inc', 'fedora_repository', 'api/fedora_item');
     $item = new Fedora_Item($pid);
     $info = $item->get_datastream_info($dsId);
@@ -922,7 +934,7 @@ class formClass {
         '#value' => t('If both a file and a reference are given, the file will be given preference.'),
       );
     }
-    
+
     $form['pid'] = array(
       '#type' => 'value',
       '#value' => $pid,

@@ -76,7 +76,7 @@ function fedora_repository_image_tagging_form($form_state, $pid) {
         'title' => $tag_title_text
       ))),
     );
-    if (user_access('modify fedora datastreams') || user_access('add fedora tags')) {
+    if (fedora_repository_check_perm('modify fedora datastreams', $pid)) {
       // Delete button for each existing tag.
       $form_tag['delete'] = array(
         '#type' => 'imagebutton',
@@ -86,7 +86,7 @@ function fedora_repository_image_tagging_form($form_state, $pid) {
       );
     }
   }
-  if (user_access('modify fedora datastreams') || user_access('add fedora tags')) {
+  if (fedora_repository_check_perm('modify fedora datastreams', $pid)) {
     $form['tags-wrapper']['addtag'] = array(
       '#type' => 'textfield',
       '#title' => t('New Tag'),
