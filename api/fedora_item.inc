@@ -253,27 +253,6 @@ class Fedora_Item {
     }
   }
 
-  protected function buildRelsStatement(&$el, $object, $type) {
-    if ($type > 0) {
-      $el->appendChild($el->ownerDocument->createTextNode($object));
-      if ($type == RELS_TYPE_STRING) {
-        $el->setAttribute('rdf:datatype', 'http://www.w3.org/2001/XMLSchema#string');
-      }
-      elseif ($type == RELS_TYPE_INT) {
-        $el->setAttribute('rdf:datatype', 'http://www.w3.org/2001/XMLSchema#int');
-      }
-      elseif ($type == RELS_TYPE_DATETIME) {
-        $el->setAttribute('rdf:datatype', 'http://www.w3.org/2001/XMLSchema#dateTime');
-      }
-      else {
-        //plain literal.
-      }
-    }
-    else {
-      $el->setAttribute('rdf:resource', $object);
-    }
-  }
-
   /**
    *
    * @param unknown_type $el
