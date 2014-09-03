@@ -1719,13 +1719,19 @@ function fedora_repository_check_perm($op, $pid = NULL, $as_user = NULL, $reset_
     global $user;
     $as_user = $user;
   }
-
-  // Populate the cache on a miss.
-  if (!isset($cache[$op][$pid][$as_user->uid]) || $dsid) {
+  if ($dsid) {
     $results = module_invoke_all('fedora_repository_check_perm', $op, $pid, $as_user, $dsid);
-    // Nothing returned FALSE, and something returned TRUE.
-    $cache[$op][$pid][$as_user->uid] = (!in_array(FALSE, $results, TRUE) && in_array(TRUE, $results, TRUE));
+    return (!in_array(FALSE, $results, TRUE) && in_array(TRUE, $results, TRUE));
   }
+  else {
+    // Populate the cache on a miss.
+    if (!isset($cache[$op][$pid][$as_user->uid])) {
+      $results = module_invoke_all('fedora_repository_check_perm', $op, $pid, $as_user);
+      // Nothing returned FALSE, and something returned TRUE.
+      $cache[$op][$pid][$as_user->uid] = (!in_array(FALSE, $results, TRUE) && in_array(TRUE, $results, TRUE));
+    }
+  }
+
 
   return $cache[$op][$pid][$as_user->uid];
 }
