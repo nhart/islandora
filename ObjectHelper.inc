@@ -93,7 +93,7 @@ class ObjectHelper {
       return ' ';
     }
 
-    if (!fedora_repository_check_perm(OBJECTHELPER :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user, TRUE, $dsID)) {
+    if (!fedora_repository_check_perm(OBJECTHELPER :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user, FALSE, $dsID)) {
       drupal_set_message(t("You do not have access Fedora objects within the attempted namespace."), 'error');
       drupal_access_denied();
       return ' ';
@@ -298,7 +298,7 @@ class ObjectHelper {
       drupal_set_message(t('You must specify an object pid and datastream ID.'), 'error');
       return '';
     }
-    if (!fedora_repository_check_perm(ObjectHelper :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user, TRUE, $dsID)) {
+    if (!fedora_repository_check_perm(ObjectHelper :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user, FALSE, $dsID)) {
       drupal_set_message(t('You do not have the appropriate permissions'), 'error');
       return;
     }
@@ -333,7 +333,7 @@ class ObjectHelper {
       drupal_set_message(t('You must specify an object pid and datastream ID.'), 'error');
       return '';
     }
-    if (!fedora_repository_check_perm(ObjectHelper :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user, TRUE, $dsID)) {
+    if (!fedora_repository_check_perm(ObjectHelper :: $OBJECT_HELPER_VIEW_FEDORA, $pid, $user, FALSE, $dsID)) {
       drupal_set_message(t('You do not have the appropriate permissions'), 'error');
       return;
     }
