@@ -1077,7 +1077,7 @@ function fedora_repository_get_items($pid = NULL, $dsId = NULL, $collection = NU
   module_load_include('inc', 'fedora_repository', 'ObjectHelper');
   module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
   module_load_include('inc', 'fedora_repository', 'api/fedora_item');
-  global $user, $conf;;
+  global $user, $conf;
   $conf['cache'] = CACHE_DISABLED;
 
   if (!fedora_available()) {
