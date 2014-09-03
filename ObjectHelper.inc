@@ -137,8 +137,6 @@ class ObjectHelper {
       $fedoraPass = $user->pass;
     }
 
-
-
     if (function_exists("curl_init")) {
       $url = variable_get('fedora_base_url', 'http://localhost:8080/fedora') . '/objects/' . $pid . '/datastreams/' . $dsID . '/content';
       $query_options = array();
@@ -1106,4 +1104,3 @@ EOQ;
     }
   }
 }
-
